@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐾 Тамагочи 3.0 ULTIMATE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --gold: #ffd700;
+            --danger: #ff6b6b;
+            --success: #00d2a0;
+            --warning: #ffa502;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            overflow-x: hidden;
+            color: #fff;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Animated Background Particles */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Main Container */
+        .game-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            padding: 25px;
+            box-shadow: 0 25px 100px rgba(0,0,0,0.5), 
+                        inset 0 1px 0 rgba(255,255,255,0.2),
+                        0 0 100px rgba(102, 126, 234, 0.2);
+            animation: containerFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes containerFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .title-section h1 {
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, #a8b2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .title-section .subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+        }
+
+        .stats-header {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,180,0,0.1));
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            animation: badgePulse 2s ease infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(255,215,0,0); }
+        }
+
+        /* Pet Display Area */
+        .pet-showcase {
+            position: relative;
+            margin: 20px auto;
+            width: 280px;
+            height: 280px;
+        }
+
+        .pet-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+            border: 3px solid rgba(255,255,255,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(102, 126, 234, 0.4),
+                        inset 0 0 60px rgba(255,255,255,0.1);
+        }
+
+        .pet-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, 
+                transparent, 
+                rgba(255,215,0,0.1), 
+                transparent, 
+                rgba(102,126,234,0.1), 
+                transparent);
+            animation: rotateGlow 10s linear infinite;
+        }
+
+        @keyframes rotateGlow {
+            100% { transform: rotate(360deg); }
+        }
+
+        .pet-inner {
+            position: relative;
+            z-index: 1;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .pet-image {
+            width: 220px;
+            height: 220px;
+            object-fit: contain;
+            border-radius: 20px;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            image-rendering: pixelated;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+        }
+
+        .pet-image.happy { 
+            animation: happyBounce 1.5s ease infinite; 
+            filter: drop-shadow(0 0 20px rgba(0,255,100,0.4));
+        }
+        .pet-image.sad { 
+            animation: sadSway 3s ease infinite; 
+            filter: grayscale(30%) drop-shadow(0 0 20px rgba(100,100,255,0.3));
+        }
+        .pet-image.depressed { 
+            animation: depressedShake 2s ease infinite; 
+            filter: grayscale(50%) brightness(0.8);
+        }
+        .pet-image.fed { 
+            animation: fedNod 2s ease infinite; 
+            filter: drop-shadow(0 0 20px rgba(255,215,0,0.4));
+        }
+        .pet-image.sleeping { 
+            animation: sleepBreathe 3s ease infinite; 
+            filter: brightness(0.7);
+        }
+        .pet-image.dead { 
+            filter: grayscale(100%) brightness(0.3); 
+            animation: none; 
+        }
+        .pet-image.evolving {
+            animation: evolveSpin 2s ease infinite;
+            filter: drop-shadow(0 0 30px rgba(255,215,0,0.8));
+        }
+
+        @keyframes happyBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            25% { transform: translateY(-15px) scale(1.05); }
+            50% { transform: translateY(0) scale(1); }
+            75% { transform: translateY(-8px) scale(1.02); }
+        }
+        @keyframes sadSway {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        @keyframes depressedShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        @keyframes fedNod {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-8px) rotate(-3deg); }
+        }
+        @keyframes sleepBreathe {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.02); opacity: 1; }
+        }
+        @keyframes evolveSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* Status Bar */
+        .status-display {
+            text-align: center;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border-radius: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-weight: 700;
+            font-size: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: statusShine 3s infinite;
+        }
+
+        @keyframes statusShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Advanced Stats */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .stat-card-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .progress-fill.hunger { background: linear-gradient(90deg, #ff6b6b, #ffa502); }
+        .progress-fill.happiness { background: linear-gradient(90deg, #a29bfe, #6c5ce7); }
+        .progress-fill.health { background: linear-gradient(90deg, #55efc4, #00b894); }
+        .progress-fill.energy { background: linear-gradient(90deg, #ffd93d, #ff9f43); }
+
+        .progress-fill.low { animation: criticalPulse 1s ease infinite; }
+
+        @keyframes criticalPulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,107,107,0.7); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 10px rgba(255,107,107,0); }
+        }
+
+        /* Action Buttons */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .action-btn {
+            position: relative;
+            padding: 15px 10px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            color: #fff;
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .action-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .action-btn .icon {
+            font-size: 28px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .action-btn.feed { background: linear-gradient(135deg, #ff9a56, #ff6b6b); }
+        .action-btn.play { background: linear-gradient(135deg, #a29bfe, #6c5ce7); }
+        .action-btn.heal { background: linear-gradient(135deg, #55efc4, #00b894); }
+        .action-btn.sleep { background: linear-gradient(135deg, #74b9ff, #0984e3); }
+        .action-btn.clean { background: linear-gradient(135deg, #fd79a8, #e84393); }
+        .action-btn.shop { background: linear-gradient(135deg, #ffd700, #ffb400); color: #333; }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin: 20px 0;
+            background: rgba(0,0,0,0.2);
+            padding: 6px;
+            border-radius: 16px;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Shop Items */
+        .shop-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .shop-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .shop-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+        }
+
+        .shop-container::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .shop-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shop-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .shop-item-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .shop-item-name {
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .shop-item-price {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, #ffd700, #ffb400);
+            color: #333;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .shop-item-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 6px;
+        }
+
+        /* Inventory */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .inventory-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .inventory-item:hover {
+            background: rgba(255,255,255,0.08);
+            transform: scale(1.05);
+        }
+
+        .inventory-count {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--gold);
+            color: #333;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        /* Achievements */
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-item.unlocked {
+            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,180,0,0.05));
+            border-color: rgba(255,215,0,0.3);
+        }
+
+        .achievement-icon {
+            font-size: 40px;
+            filter: grayscale(100%);
+            transition: all 0.3s ease;
+        }
+
+        .achievement-item.unlocked .achievement-icon {
+            filter: grayscale(0%);
+            animation: achievementPop 0.6s ease;
+        }
+
+        @keyframes achievementPop {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.3) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .achievement-info {
+            flex: 1;
+        }
+
+        .achievement-name {
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .achievement-desc {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 100px rgba(0,0,0,0.5);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+
+        .modal-text {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            font-family: 'Nunito', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Floating Text */
+        .floating-text {
+            position: fixed;
+            font-size: 20px;
+            font-weight: 900;
+            pointer-events: none;
+            animation: floatUp 1.5s ease forwards;
+            z-index: 100;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        @keyframes floatUp {
+            0% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1) rotate(0deg); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-100px) scale(1.5) rotate(10deg); 
+            }
+        }
+
+        /* Evolution Notification */
+        .evolution-banner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, rgba(255,215,0,0.95), rgba(255,180,0,0.95));
+            color: #333;
+            padding: 40px 60px;
+            border-radius: 30px;
+            text-align: center;
+            z-index: 2000;
+            box-shadow: 0 25px 100px rgba(255,215,0,0.5);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .evolution-banner.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .evolution-banner h2 {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+
+        .evolution-banner p {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .game-container { padding: 15px; }
+            .title-section h1 { font-size: 22px; }
+            .pet-showcase { width: 240px; height: 240px; }
+            .pet-inner { width: 220px; height: 220px; }
+            .pet-image { width: 190px; height: 190px; }
+            .actions-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-panel { grid-template-columns: 1fr; }
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f0c29, #302b63);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.8);
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas-container"></canvas>
+
+<div class="loading-screen" id="loadingScreen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Загрузка мира...</div>
+</div>
+
+<div class="game-wrapper">
+    <div class="game-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="title-section">
+                <h1>🐾 ТАМАГОЧИ 3.0</h1>
+                <div class="subtitle">ULTIMATE EDITION</div>
+            </div>
+            <div class="stats-header">
+                <div class="stat-badge">
+                    <span>🪙</span>
+                    <span id="coinsDisplay">100</span>
+                </div>
+                <div class="stat-badge" style="background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.1)); border-color: rgba(102,126,234,0.3);">
+                    <span>⭐</span>
+                    <span id="levelDisplay">1</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pet Showcase -->
+        <div class="pet-showcase">
+            <div class="pet-container">
+                <div class="pet-inner">
+                    <img id="petImage" class="pet-image happy" 
+                         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%23ffd700'/%3E%3Ctext x='100' y='120' font-size='60' text-anchor='middle'%3E😊%3C/text%3E%3C/svg%3E" 
+                         alt="Pet">
+                </div>
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div class="status-display" id="statusBar">
+            <span id="statusText">😊 Ваш питомец счастлив и полон энергии!</span>
+        </div>
+
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-title">🍖 Сытость</div>
+                    <div class="stat-card-value" id="hungerVal">80</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill hunger" id="hungerBar" style="width: 80%"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-title">💜 Счастье</div>
+                    <div class="stat-card-value" id="happinessVal">80</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill happiness" id="happinessBar" style="width: 80%"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-title">💚 Здоровье</div>
+                    <div class="stat-card-value" id="healthVal">100</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill health" id="healthBar" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-title">⚡ Энергия</div>
+                    <div class="stat-card-value" id="energyVal">100</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill energy" id="energyBar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="actions-grid">
+            <button class="action-btn feed" onclick="game.feed()">
+                <span class="icon">🍕</span>
+                <span>Покормить</span>
+            </button>
+            <button class="action-btn play" onclick="game.play()">
+                <span class="icon">🎮</span>
+                <span>Играть</span>
+            </button>
+            <button class="action-btn heal" onclick="game.heal()">
+                <span class="icon">💊</span>
+                <span>Лечить</span>
+            </button>
+            <button class="action-btn sleep" onclick="game.sleep()">
+                <span class="icon">😴</span>
+                <span>Спать</span>
+            </button>
+            <button class="action-btn clean" onclick="game.clean()">
+                <span class="icon">🧹</span>
+                <span>Убрать</span>
+            </button>
+            <button class="action-btn shop" onclick="game.openShop()">
+                <span class="icon">🛒</span>
+                <span>Магазин</span>
+            </button>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="game.switchTab('stats')">📊 Статистика</button>
+            <button class="nav-tab" onclick="game.switchTab('inventory')">🎒 Инвентарь</button>
+            <button class="nav-tab" onclick="game.switchTab('achievements')">🏆 Достижения</button>
+            <button class="nav-tab" onclick="game.switchTab('settings')">⚙️ Настройки</button>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="tab-stats" class="tab-content active">
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-title">🎂 Возраст</div>
+                        <div class="stat-card-value" id="ageDisplay">0 дн.</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-title">🏆 Очки</div>
+                        <div class="stat-card-value" id="scoreDisplay">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-title">🎯 Уровень</div>
+                        <div class="stat-card-value" id="petLevelDisplay">1</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-title">✨ Опыт</div>
+                        <div class="stat-card-value" id="xpDisplay">0/100</div>
+                    </div>
+                    <div class="progress-bar" style="margin-top: 8px;">
+                        <div class="progress-fill happiness" id="xpBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Tab -->
+        <div id="tab-inventory" class="tab-content">
+            <div class="inventory-grid" id="inventoryGrid">
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">
+                    Инвентарь пуст 📭
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements Tab -->
+        <div id="tab-achievements" class="tab-content">
+            <div id="achievementsList"></div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="tab-settings" class="tab-content">
+            <div class="stat-card" style="margin-bottom: 10px;">
+                <div class="stat-card-header">
+                    <div class="stat-card-title">🔊 Звук</div>
+                    <button class="action-btn" style="padding: 8px 16px;" onclick="game.toggleSound()" id="soundBtn">
+                        <span class="icon">🔊</span>
+                    </button>
+                </div>
+            </div>
+            <div class="stat-card" style="margin-bottom: 10px;">
+                <div class="stat-card-header">
+                    <div class="stat-card-title">💾 Сохранение</div>
+                    <button class="action-btn" style="padding: 8px 16px;" onclick="game.saveGame()">
+                        <span class="icon">💾</span>
+                        <span>Сохранить</span>
+                    </button>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-title">🔄 Сброс</div>
+                    <button class="action-btn" style="padding: 8px 16px; background: linear-gradient(135deg, #ff6b6b, #ee5a6f);" onclick="game.resetGame()">
+                        <span class="icon">🗑️</span>
+                        <span>Сбросить</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Death Overlay -->
+        <div class="modal-overlay" id="deathModal">
+            <div class="modal">
+                <div class="modal-icon">💀</div>
+                <div class="modal-title">Питомец погиб...</div>
+                <div class="modal-text">Вы не смогли позаботиться о нём должным образом. Попробуйте ещё раз!</div>
+                <button class="modal-btn" onclick="game.revive()">🔄 Возродить (50🪙)</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Evolution Banner -->
+<div class="evolution-banner" id="evolutionBanner">
+    <h2>🎉 ЭВОЛЮЦИЯ!</h2>
+    <p id="evolutionText">Ваш питомец вырос!</p>
+</div>
+
+<script>
+// ===== PARTICLE SYSTEM =====
+class ParticleSystem {
+    constructor() {
+        this.canvas = document.getElementById('canvas-container');
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.animate();
+    }
+
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+
+    createParticle(x, y, type = 'sparkle') {
+        const colors = {
+            sparkle: ['#ffd700', '#fff', '#ffa500'],
+            heart: ['#ff6b9d', '#ff8fab', '#ffc2d1'],
+            coin: ['#ffd700', '#ffb400', '#ff8c00'],
+            star: ['#fff', '#a8b2ff', '#ffd700']
+        };
+        
+        const particle = {
+            x, y,
+            vx: (Math.random() - 0.5) * 4,
+            vy: (Math.random() - 0.5) * 4 - 2,
+            life: 1,
+            color: colors[type][Math.floor(Math.random() * colors[type].length)],
+            size: Math.random() * 6 + 2,
+            type
+        };
+        this.particles.push(particle);
+    }
+
+    animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        this.particles = this.particles.filter(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.1;
+            p.life -= 0.02;
+            
+            if (p.life <= 0) return false;
+            
+            this.ctx.globalAlpha = p.life;
+            this.ctx.fillStyle = p.color;
+            this.ctx.beginPath();
+            
+            if (p.type === 'heart') {
+                this.drawHeart(p.x, p.y, p.size);
+            } else if (p.type === 'star') {
+                this.drawStar(p.x, p.y, p.size);
+            } else {
+                this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+            
+            return true;
+        });
+        
+        this.ctx.globalAlpha = 1;
+        requestAnimationFrame(() => this.animate());
+    }
+
+    drawHeart(x, y, size) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, y + size/2);
+        this.ctx.bezierCurveTo(x, y, x - size/2, y - size/2, x - size/2, y);
+        this.ctx.bezierCurveTo(x - size/2, y - size, x + size/2, y - size, x + size/2, y);
+        this.ctx.bezierCurveTo(x + size/2, y - size/2, x, y, x, y + size/2);
+        this.ctx.fill();
+    }
+
+    drawStar(x, y, size) {
+        this.ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+            const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+            const px = x + Math.cos(angle) * size;
+            const py = y + Math.sin(angle) * size;
+            if (i === 0) this.ctx.moveTo(px, py);
+            else this.ctx.lineTo(px, py);
+        }
+        this.ctx.closePath();
+        this.ctx.fill();
+    }
+
+    burst(x, y, type = 'sparkle', count = 10) {
+        for (let i = 0; i < count; i++) {
+            this.createParticle(x, y, type);
+        }
+    }
+}
+
+// ===== GAME CLASS =====
+class TamagotchiGame {
+    constructor() {
+        this.particles = new ParticleSystem();
+        this.state = this.loadGame() || this.getInitialState();
+        this.shopItems = this.getShopItems();
+        this.achievements = this.getAchievements();
+        this.currentTab = 'stats';
+        this.isSleeping = false;
+        
+        this.init();
+    }
+
+    getInitialState() {
+        return {
+            hunger: 80,
+            happiness: 80,
+            health: 100,
+            energy: 100,
+            coins: 100,
+            score: 0,
+            age: 0,
+            level: 1,
+            xp: 0,
+            xpToNext: 100,
+            isAlive: true,
+            sound: true,
+            inventory: {},
+            unlockedAchievements: [],
+            lastSave: Date.now(),
+            evolutionStage: 0,
+            cleanliness: 100,
+            actions: { feed: 0, play: 0, heal: 0, sleep: 0, clean: 0 }
+        };
+    }
+
+    getShopItems() {
+        return [
+            { id: 'pizza', name: 'Пицца', icon: '🍕', price: 15, effect: { hunger: 35 }, desc: '+35 сытости' },
+            { id: 'cake', name: 'Торт', icon: '🎂', price: 25, effect: { hunger: 20, happiness: 15 }, desc: '+20 сытости, +15 счастья' },
+            { id: 'burger', name: 'Бургер', icon: '🍔', price: 20, effect: { hunger: 30, health: -5 }, desc: '+30 сытости, -5 здоровья' },
+            { id: 'toy', name: 'Игрушка', icon: '🧸', price: 30, effect: { happiness: 40 }, desc: '+40 счастья' },
+            { id: 'ball', name: 'Мячик', icon: '⚽', price: 20, effect: { happiness: 25, energy: -10 }, desc: '+25 счастья, -10 энергии' },
+            { id: 'medicine', name: 'Лекарство', icon: '💊', price: 35, effect: { health: 35, happiness: 10 }, desc: '+35 здоровья' },
+            { id: 'vitamin', name: 'Витамины', icon: '💉', price: 20, effect: { health: 20, energy: 10 }, desc: '+20 здоровья, +10 энергии' },
+            { id: 'coffee', name: 'Кофе', icon: '☕', price: 15, effect: { energy: 30, happiness: 5 }, desc: '+30 энергии' },
+            { id: 'spa', name: 'СПА', icon: '🛁', price: 40, effect: { health: 15, happiness: 25, cleanliness: 50 }, desc: 'Полный релакс!' },
+            { id: 'book', name: 'Книга', icon: '📚', price: 25, effect: { happiness: 20, energy: -5 }, desc: '+20 счастья, -5 энергии' },
+            { id: 'music', name: 'Музыка', icon: '🎵', price: 20, effect: { happiness: 30 }, desc: '+30 счастья' },
+            { id: 'diamond', name: 'Алмаз', icon: '💎', price: 100, effect: { happiness: 50, health: 20 }, desc: 'Роскошный подарок!' }
+        ];
+    }
+
+    getAchievements() {
+        return [
+            { id: 'first_feed', name: 'Первый обед', desc: 'Покормите питомца впервые', icon: '🍽️', check: s => s.actions.feed > 0 },
+            { id: 'survive_day', name: 'Выживший', desc: 'Проживите 1 день', icon: '🌅', check: s => s.age >= 1 },
+            { id: 'rich', name: 'Богач', desc: 'Накопите 100 монет', icon: '💰', check: s => s.coins >= 100 },
+            { id: 'happy_pet', name: 'Счастливчик', desc: 'Доведите счастье до 100', icon: '🥳', check: s => s.happiness >= 100 },
+            { id: 'collector', name: 'Коллекционер', desc: 'Купите 5 разных предметов', icon: '🎁', check: s => Object.keys(s.inventory).length >= 5 },
+            { id: 'care_master', name: 'Мастер заботы', desc: 'Наберите 500 очков', icon: '👑', check: s => s.score >= 500 },
+            { id: 'clean_freak', name: 'Чистюля', desc: 'Поддерживайте чистоту 100%', icon: '✨', check: s => s.cleanliness >= 100 && s.actions.clean > 5 },
+            { id: 'evolution', name: 'Эволюция', desc: 'Достигните 5 уровня', icon: '🦋', check: s => s.level >= 5 },
+            { id: 'immortal', name: 'Бессмертный', desc: 'Проживите 7 дней', icon: '♾️', check: s => s.age >= 7 },
+            { id: 'millionaire', name: 'Миллионер', desc: 'Накопите 1000 монет', icon: '💵', check: s => s.coins >= 1000 }
+        ];
+    }
+
+    init() {
+        this.startGameLoop();
+        this.updateUI();
+        this.checkAchievements();
+        
+        // Hide loading screen
+        setTimeout(() => {
+            document.getElementById('loadingScreen').classList.add('hidden');
+        }, 1000);
+
+        // Auto-save every 30 seconds
+        setInterval(() => this.saveGame(), 30000);
+    }
+
+    startGameLoop() {
+        setInterval(() => this.tick(), 2000);
+        setInterval(() => this.ageTick(), 60000);
+    }
+
+    tick() {
+        if (!this.state.isAlive || this.isSleeping) return;
+
+        // Decay stats
+        this.state.hunger = Math.max(0, this.state.hunger - 2);
+        this.state.happiness = Math.max(0, this.state.happiness - 1.5);
+        this.state.energy = Math.max(0, this.state.energy - 1);
+        this.state.cleanliness = Math.max(0, this.state.cleanliness - 0.5);
+
+        // Health decay based on conditions
+        if (this.state.hunger < 20) this.state.health -= 2;
+        else if (this.state.hunger < 40) this.state.health -= 1;
+        
+        if (this.state.happiness < 20) this.state.health -= 1;
+        if (this.state.cleanliness < 30) this.state.health -= 0.5;
+
+        // Clamp values
+        this.state.health = Math.max(0, Math.min(100, this.state.health));
+
+        // Check death
+        if (this.state.hunger <= 0 || this.state.health <= 0) {
+            this.die();
+        }
+
+        this.updateUI();
+    }
+
+    ageTick() {
+        if (!this.state.isAlive) return;
+        
+        this.state.age++;
+        this.state.coins += 10; // Daily bonus
+        
+        // Check evolution
+        if (this.state.level >= 3 && this.state.evolutionStage === 0) {
+            this.evolve(1);
+        } else if (this.state.level >= 7 && this.state.evolutionStage === 1) {
+            this.evolve(2);
+        }
+
+        this.showFloatingText('🌅 Новый день! +10🪙', window.innerWidth/2, window.innerHeight/2);
+        this.updateUI();
+    }
+
+    feed() {
+        if (!this.checkAction()) return;
+        
+        this.state.hunger = Math.min(100, this.state.hunger + 25);
+        this.state.happiness = Math.min(100, this.state.happiness + 5);
+        this.state.energy = Math.max(0, this.state.energy - 5);
+        this.state.coins += 2;
+        this.state.score += 10;
+        this.state.actions.feed++;
+        this.addXP(10);
+        
+        this.particles.burst(window.innerWidth/2, window.innerHeight/2 - 100, 'sparkle', 15);
+        this.showFloatingText('🍕 +25 сытости!', window.innerWidth/2, window.innerHeight/2 - 150);
+        this.updatePetState('fed');
+        this.updateUI();
+    }
+
+    play() {
+        if (!this.checkAction()) return;
+        if (this.state.energy < 20) {
+            this.showFloatingText('😴 Слишком устал!', window.innerWidth/2, window.innerHeight/2);
+            return;
+        }
+        
+        this.state.happiness = Math.min(100, this.state.happiness + 30);
+        this.state.hunger = Math.max(0, this.state.hunger - 8);
+        this.state.energy = Math.max(0, this.state.energy - 20);
+        this.state.coins += 3;
+        this.state.score += 15;
+        this.state.actions.play++;
+        this.addXP(15);
+        
+        this.particles.burst(window.innerWidth/2, window.innerHeight/2 - 100, 'heart', 20);
+        this.showFloatingText('🎮 +30 счастья!', window.innerWidth/2, window.innerHeight/2 - 150);
+        this.updatePetState('happy');
+        this.updateUI();
+    }
+
+    heal() {
+        if (!this.checkAction()) return;
+        
+        this.state.health = Math.min(100, this.state.health + 25);
+        this.state.happiness = Math.min(100, this.state.happiness + 10);
+        this.state.coins += 2;
+        this.state.score += 8;
+        this.state.actions.heal++;
+        this.addXP(8);
+        
+        this.particles.burst(window.innerWidth/2, window.innerHeight/2 - 100, 'sparkle', 12);
+        this.showFloatingText('💊 +25 здоровья!', window.innerWidth/2, window.innerHeight/2 - 150);
+        this.updateUI();
+    }
+
+    sleep() {
+        if (!this.checkAction()) return;
+        if (this.isSleeping) {
+            this.wakeUp();
+            return;
+        }
+        
+        this.isSleeping = true;
+        this.state.actions.sleep++;
+        this.updatePetState('sleeping');
+        
+        // Sleep for 10 seconds (accelerated time)
+        let sleepTicks = 0;
+        const sleepInterval = setInterval(() => {
+            this.state.energy = Math.min(100, this.state.energy + 10);
+            this.state.happiness = Math.min(100, this.state.happiness + 2);
+            sleepTicks++;
+            
+            if (sleepTicks >= 10 || this.state.energy >= 100) {
+                clearInterval(sleepInterval);
+                this.wakeUp();
+            }
+            this.updateUI();
+        }, 1000);
+        
+        this.showFloatingText('😴 Питомец спит...', window.innerWidth/2, window.innerHeight/2);
+    }
+
+    wakeUp() {
+        this.isSleeping = false;
+        this.showFloatingText('☀️ Доброе утро!', window.innerWidth/2, window.innerHeight/2);
+        this.updatePetState('happy');
+        this.updateUI();
+    }
+
+    clean() {
+        if (!this.checkAction()) return;
+        
+        this.state.cleanliness = 100;
+        this.state.happiness = Math.min(100, this.state.happiness + 15);
+        this.state.health = Math.min(100, this.state.health + 5);
+        this.state.coins += 2;
+        this.state.score += 5;
+        this.state.actions.clean++;
+        this.addXP(5);
+        
+        this.particles.burst(window.innerWidth/2, window.innerHeight/2 - 100, 'sparkle', 10);
+        this.showFloatingText('✨ Чистота! +15 счастья', window.innerWidth/2, window.innerHeight/2 - 150);
+        this.updateUI();
+    }
+
+    openShop() {
+        if (!this.checkAction()) return;
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay active';
+        modal.innerHTML = `
+            <div class="modal" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                <div class="modal-title">🛒 Магазин</div>
+                <div class="modal-text">У вас ${this.state.coins}🪙</div>
+                <div class="shop-grid">
+                    ${this.shopItems.map(item => `
+                        <div class="shop-item" onclick="game.buyItem('${item.id}')">
+                            <span class="shop-item-icon">${item.icon}</span>
+                            <div class="shop-item-name">${item.name}</div>
+                            <div class="shop-item-price">🪙 ${item.price}</div>
+                            <div class="shop-item-desc">${item.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="modal-btn" onclick="this.closest('.modal-overlay').remove()" style="margin-top: 20px;">Закрыть</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    buyItem(itemId) {
+        const item = this.shopItems.find(i => i.id === itemId);
+        if (!item || this.state.coins < item.price) {
+            this.showFloatingText('❌ Недостаточно монет!', window.innerWidth/2, window.innerHeight/2);
+            return;
+        }
+        
+        this.state.coins -= item.price;
+        this.state.inventory[itemId] = (this.state.inventory[itemId] || 0) + 1;
+        
+        this.particles.burst(window.innerWidth/2, window.innerHeight/2, 'coin', 15);
+        this.showFloatingText(`✅ ${item.name} куплен!`, window.innerWidth/2, window.innerHeight/2);
+        this.updateUI();
+    }
+
+    useItem(itemId) {
+        const item = this.shopItems.find(i => i.id === itemId);
+        if (!item || !this.state.inventory[itemId]) return;
+        
+        Object.entries(item.effect).forEach(([stat, value]) => {
+            this.state[stat] = Math.max(0, Math.min(100, this.state[stat] + value));
+        });
+        
+        this.state.inventory[itemId]--;
+        if (this.state.inventory[itemId] <= 0) delete this.state.inventory[itemId];
+        
+        this.particles.burst(window.innerWidth/2, window.innerHeight/2 - 100, 'sparkle', 10);
+        this.showFloatingText(`✨ ${item.name} использован!`, window.innerWidth/2, window.innerHeight/2 - 150);
+        this.updateUI();
+        this.renderInventory();
+    }
+
+    addXP(amount) {
+        this.state.xp += amount;
+        if (this.state.xp >= this.state.xpToNext) {
+            this.levelUp();
+        }
+    }
+
+    levelUp() {
+        this.state.level++;
+        this.state.xp -= this.state.xpToNext;
+        this.state.xpToNext = Math.floor(this.state.xpToNext * 1.5);
+        this.state.coins += 20;
+        
+        this.showFloatingText(`🎉 УРОВЕНЬ ${this.state.level}!`, window.innerWidth/2, window.innerHeight/2 - 100);
+        this.particles.burst(window.innerWidth/2, window.innerHeight/2 - 100, 'star', 30);
+        
+        // Check evolution
+        if (this.state.level === 3 && this.state.evolutionStage === 0) {
+            setTimeout(() => this.evolve(1), 1000);
+        } else if (this.state.level === 7 && this.state.evolutionStage === 1) {
+            setTimeout(() => this.evolve(2), 1000);
+        }
+    }
+
+    evolve(stage) {
+        this.state.evolutionStage = stage;
+        const banner = document.getElementById('evolutionBanner');
+        const text = document.getElementById('evolutionText');
+        
+        const stages = ['🐣 Яйцо', '🐥 Птенец', '🦅 Птица', '🦄 Феникс'];
+        text.textContent = `Ваш питомец стал: ${stages[stage]}!`;
+        
+        banner.classList.add('show');
+        this.particles.burst(window.innerWidth/2, window.innerHeight/2, 'star', 50);
+        
+        setTimeout(() => {
+            banner.classList.remove('show');
+        }, 3000);
+        
+        this.updatePetImage();
+    }
+
+    checkAction() {
+        if (!this.state.isAlive) {
+            document.getElementById('deathModal').classList.add('active');
+            return false;
+        }
+        return true;
+    }
+
+    updatePetState(state) {
+        const img = document.getElementById('petImage');
+        img.className = `pet-image ${state}`;
+        setTimeout(() => this.updatePetImage(), 2000);
+    }
+
+    updatePetImage() {
+        if (!this.state.isAlive) return;
+        
+        const img = document.getElementById('petImage');
+        const { hunger, happiness, health, energy, cleanliness } = this.state;
+        
+        // Determine state based on stats
+        if (this.isSleeping) {
+            img.className = 'pet-image sleeping';
+        } else if (hunger < 30 && happiness < 30) {
+            img.className = 'pet-image depressed';
+        } else if (hunger < 50 || happiness < 50 || cleanliness < 50) {
+            img.className = 'pet-image sad';
+        } else if (hunger > 70 && happiness > 70 && energy > 50) {
+            img.className = 'pet-image happy';
+        } else {
+            img.className = 'pet-image';
+        }
+    }
+
+    updateStatus() {
+        const { hunger, happiness, health, energy, cleanliness } = this.state;
+        const statusEl = document.getElementById('statusText');
+        
+        if (!this.state.isAlive) {
+            statusEl.textContent = '💀 Питомец погиб...';
+            return;
+        }
+        
+        if (this.isSleeping) {
+            statusEl.textContent = '😴 Питомец спит...';
+            return;
+        }
+        
+        if (hunger < 20 || health < 20) {
+            statusEl.textContent = '🚨 КРИТИЧЕСКОЕ СОСТОЯНИЕ! Срочно помогите!';
+        } else if (hunger < 40) {
+            statusEl.textContent = '😟 Питомец голоден! Покормите его!';
+        } else if (happiness < 40) {
+            statusEl.textContent = '😔 Питомец грустит! Поиграйте с ним!';
+        } else if (energy < 30) {
+            statusEl.textContent = '😴 Питомец устал! Дайте ему поспать!';
+        } else if (cleanliness < 40) {
+            statusEl.textContent = '🧹 В комнате грязно! Уберите!';
+        } else if (hunger > 70 && happiness > 70 && energy > 70) {
+            statusEl.textContent = '😊 Питомец счастлив и полон энергии!';
+        } else {
+            statusEl.textContent = '👍 Всё в порядке!';
+        }
+    }
+
+    updateUI() {
+        // Update stats
+        document.getElementById('hungerVal').textContent = Math.round(this.state.hunger);
+        document.getElementById('happinessVal').textContent = Math.round(this.state.happiness);
+        document.getElementById('healthVal').textContent = Math.round(this.state.health);
+        document.getElementById('energyVal').textContent = Math.round(this.state.energy);
+        document.getElementById('coinsDisplay').textContent = this.state.coins;
+        document.getElementById('levelDisplay').textContent = this.state.level;
+        document.getElementById('ageDisplay').textContent = `${this.state.age} дн.`;
+        document.getElementById('scoreDisplay').textContent = this.state.score;
+        document.getElementById('petLevelDisplay').textContent = this.state.level;
+        document.getElementById('xpDisplay').textContent = `${Math.round(this.state.xp)}/${this.state.xpToNext}`;
+        
+        // Update bars
+        document.getElementById('hungerBar').style.width = `${this.state.hunger}%`;
+        document.getElementById('happinessBar').style.width = `${this.state.happiness}%`;
+        document.getElementById('healthBar').style.width = `${this.state.health}%`;
+        document.getElementById('energyBar').style.width = `${this.state.energy}%`;
+        document.getElementById('xpBar').style.width = `${(this.state.xp / this.state.xpToNext) * 100}%`;
+        
+        // Low stat warnings
+        ['hunger', 'happiness', 'health', 'energy'].forEach(stat => {
+            const bar = document.getElementById(`${stat}Bar`);
+            if (this.state[stat] < 25) bar.classList.add('low');
+            else bar.classList.remove('low');
+        });
+        
+        this.updateStatus();
+        this.updatePetImage();
+        this.checkAchievements();
+    }
+
+    checkAchievements() {
+        this.achievements.forEach(ach => {
+            if (!this.state.unlockedAchievements.includes(ach.id) && ach.check(this.state)) {
+                this.state.unlockedAchievements.push(ach.id);
+                this.showAchievement(ach);
+                this.state.coins += 10;
+            }
+        });
+    }
+
+    showAchievement(ach) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay active';
+        modal.innerHTML = `
+            <div class="modal">
+                <div class="modal-icon">${ach.icon}</div>
+                <div class="modal-title">🏆 Достижение!</div>
+                <div class="modal-text"><strong>${ach.name}</strong><br>${ach.desc}</div>
+                <div style="color: var(--gold); font-weight: 800; margin-bottom: 15px;">+10🪙</div>
+                <button class="modal-btn" onclick="this.closest('.modal-overlay').remove()">Круто!</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        this.particles.burst(window.innerWidth/2, window.innerHeight/2, 'star', 25);
+    }
+
+    renderInventory() {
+        const grid = document.getElementById('inventoryGrid');
+        const items = Object.entries(this.state.inventory);
+        
+        if (items.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">Инвентарь пуст 📭</div>';
+            return;
+        }
+        
+        grid.innerHTML = items.map(([id, count]) => {
+            const item = this.shopItems.find(i => i.id === id);
+            return `
+                <div class="inventory-item" onclick="game.useItem('${id}')">
+                    <div class="inventory-count">${count}</div>
+                    <div style="font-size: 40px; margin-bottom: 8px;">${item?.icon || '📦'}</div>
+                    <div style="font-size: 12px; font-weight: 700;">${item?.name || id}</div>
+                    <div style="font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 4px;">Нажмите чтобы использовать</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    renderAchievements() {
+        const list = document.getElementById('achievementsList');
+        list.innerHTML = this.achievements.map(ach => {
+            const unlocked = this.state.unlockedAchievements.includes(ach.id);
+            return `
+                <div class="achievement-item ${unlocked ? 'unlocked' : ''}">
+                    <div class="achievement-icon">${ach.icon}</div>
+                    <div class="achievement-info">
+                        <div class="achievement-name">${ach.name}</div>
+                        <div class="achievement-desc">${ach.desc}</div>
+                    </div>
+                    <div style="font-size: 12px; font-weight: 800; ${unlocked ? 'color: var(--gold);' : 'color: rgba(255,255,255,0.4);'}">
+                        ${unlocked ? '✓' : '🔒'}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    switchTab(tab) {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        
+        event.target.classList.add('active');
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        this.currentTab = tab;
+        
+        if (tab === 'inventory') this.renderInventory();
+        if (tab === 'achievements') this.renderAchievements();
+    }
+
+    die() {
+        this.state.isAlive = false;
+        document.getElementById('deathModal').classList.add('active');
+    }
+
+    revive() {
+        if (this.state.coins >= 50) {
+            this.state.coins -= 50;
+            this.state.isAlive = true;
+            this.state.hunger = 50;
+            this.state.happiness = 50;
+            this.state.health = 50;
+            this.state.energy = 50;
+            document.getElementById('deathModal').classList.remove('active');
+            this.showFloatingText('✨ Питомец возрождён!', window.innerWidth/2, window.innerHeight/2);
+            this.updateUI();
+        } else {
+            this.showFloatingText('❌ Нужно 50 монет!', window.innerWidth/2, window.innerHeight/2);
+        }
+    }
+
+    toggleSound() {
+        this.state.sound = !this.state.sound;
+        document.getElementById('soundBtn').innerHTML = `<span class="icon">${this.state.sound ? '🔊' : '🔇'}</span>`;
+    }
+
+    saveGame() {
+        this.state.lastSave = Date.now();
+        localStorage.setItem('tamagotchi3_save', JSON.stringify(this.state));
+        this.showFloatingText('💾 Игра сохранена!', window.innerWidth/2, window.innerHeight/2 - 100);
+    }
+
+    loadGame() {
+        try {
+            const saved = localStorage.getItem('tamagotchi3_save');
+            return saved ? JSON.parse(saved) : null;
+        } catch (e) {
+            console.error('Load error:', e);
+            return null;
+        }
+    }
+
+    resetGame() {
+        if (confirm('Вы уверены? Весь прогресс будет потерян!')) {
+            localStorage.removeItem('tamagotchi3_save');
+            location.reload();
+        }
+    }
+
+    showFloatingText(text, x, y) {
+        const el = document.createElement('div');
+        el.className = 'floating-text';
+        el.textContent = text;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.style.color = text.includes('❌') ? '#ff6b6b' : text.includes('✅') ? '#00d2a0' : '#ffd700';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1500);
+    }
+}
+
+// Initialize game
+let game;
+window.addEventListener('load', () => {
+    game = new TamagotchiGame();
+});
+
+// Auto-save on page unload
+window.addEventListener('beforeunload', () => {
+    if (game) game.saveGame();
+});
+</script>
+
+</body>
+</html>
