@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Научный калькулятор</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --calc-bg: #1e1e1e;
+            --display-bg: #2a2a2a;
+            --text: #e0e0e0;
+            --text-dim: #888;
+            --btn: #333;
+            --btn-hover: #444;
+            --btn-active: #555;
+            --accent: #0d6efd;
+            --accent-hover: #0b5ed7;
+            --sci: #4a4a4a;
+            --sci-hover: #5a5a5a;
+            --danger: #dc3545;
+            --danger-hover: #bb2d3b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: var(--calc-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .display {
+            background: var(--display-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: right;
+        }
+
+        #display {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 28px;
+            font-family: 'Courier New', monospace;
+            outline: none;
+            text-align: right;
+        }
+
+        .mode-indicator {
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        button {
+            padding: 14px 5px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: var(--btn);
+            color: var(--text);
+            transition: all 0.15s;
+            font-weight: 500;
+        }
+
+        button:hover { background: var(--btn-hover); transform: translateY(-1px); }
+        button:active { background: var(--btn-active); transform: translateY(0); }
+
+        .sci { background: var(--sci); }
+        .sci:hover { background: var(--sci-hover); }
+
+        .accent { background: var(--accent); }
+        .accent:hover { background: var(--accent-hover); }
+
+        .danger { background: var(--danger); }
+        .danger:hover { background: var(--danger-hover); }
+
+        .zero { grid-column: span 2; }
+
+        @media (max-width: 480px) {
+            button { padding: 12px 3px; font-size: 14px; }
+            #display { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <div class="display">
+        <div class="mode-indicator" id="modeIndicator">РАД</div>
+        <input type="text" id="display" readonly value="0">
+    </div>
+    <div class="buttons">
+        <!-- Память и режим -->
+        <button class="sci" onclick="memoryClear()">MC</button>
+        <button class="sci" onclick="memoryRecall()">MR</button>
+        <button class="sci" onclick="memoryAdd()">M+</button>
+        <button class="sci" onclick="memorySub()">M-</button>
+        <button class="accent" id="angleBtn" onclick="toggleAngle()">DEG</button>
+
+        <!-- Тригонометрия и логарифмы -->
+        <button class="sci" onclick="append('sin(')">sin</button>
+        <button class="sci" onclick="append('cos(')">cos</button>
+        <button class="sci" onclick="append('tan(')">tan</button>
+        <button class="sci" onclick="append('log(')">log</button>
+        <button class="sci" onclick="append('ln(')">ln</button>
+
+        <button class="sci" onclick="append('asin(')">sin⁻¹</button>
+        <button class="sci" onclick="append('acos(')">cos⁻¹</button>
+        <button class="sci" onclick="append('atan(')">tan⁻¹</button>
+        <button class="sci" onclick="append('sqrt(')">√</button>
+        <button class="sci" onclick="append('^')">xʸ</button>
+
+        <button class="sci" onclick="append('π')">π</button>
+        <button class="sci" onclick="append('e')">e</button>
+        <button class="sci" onclick="append('(')">(</button>
+        <button class="sci" onclick="append(')')">)</button>
+        <button class="sci" onclick="append('!')">n!</button>
+
+        <!-- Цифры и операторы -->
+        <button onclick="append('7')">7</button>
+        <button onclick="append('8')">8</button>
+        <button onclick="append('9')">9</button>
+        <button onclick="append('/')">÷</button>
+        <button class="danger" onclick="backspace()">⌫</button>
+
+        <button onclick="append('4')">4</button>
+        <button onclick="append('5')">5</button>
+        <button onclick="append('6')">6</button>
+        <button onclick="append('*')">×</button>
+        <button class="danger" onclick="clearDisplay()">C</button>
+
+        <button onclick="append('1')">1</button>
+        <button onclick="append('2')">2</button>
+        <button onclick="append('3')">3</button>
+        <button onclick="append('-')">−</button>
+        <button class="accent" onclick="calculate()">=</button>
+
+        <button class="zero" onclick="append('0')">0</button>
+        <button onclick="append('.')">.</button>
+        <button onclick="append('+')">+</button>
+        <button class="sci" onclick="square()">x²</button>
+    </div>
+</div>
+
+<script>
+    const display = document.getElementById('display');
+    const modeIndicator = document.getElementById('modeIndicator');
+    let angleMode = 'RAD'; // RAD или DEG
+    let memory = 0;
+
+    function updateDisplay(val) {
+        display.value = val === '' ? '0' : val;
+    }
+
+    function append(value) {
+        if (display.value === '0' || display.value === 'Ошибка') {
+            updateDisplay(value);
+        } else {
+            display.value += value;
+        }
+    }
+
+    function clearDisplay() { updateDisplay('0'); }
+
+    function backspace() {
+        let val = display.value;
+        if (val.length > 0) {
+            updateDisplay(val.slice(0, -1));
+        }
+    }
+
+    function square() {
+        append('^2');
+    }
+
+    function toggleAngle() {
+        angleMode = angleMode === 'RAD' ? 'DEG' : 'RAD';
+        document.getElementById('angleBtn').textContent = angleMode === 'RAD' ? 'DEG' : 'RAD';
+        modeIndicator.textContent = angleMode;
+    }
+
+    // Факториал
+    function factorial(n) {
+        n = Math.floor(n);
+        if (n < 0) return NaN;
+        if (n === 0 || n === 1) return 1;
+        let res = 1;
+        for (let i = 2; i <= n; i++) res *= i;
+        return res;
+    }
+
+    function calculate() {
+        let expr = display.value;
+        if (!expr) return;
+
+        try {
+            // Замена символов на JS-эквиваленты
+            expr = expr.replace(/π/g, 'Math.PI');
+            expr = expr.replace(/e/g, 'Math.E');
+            expr = expr.replace(/\^/g, '**');
+            
+            // Обработка градусов/радиан для тригонометрии
+            if (angleMode === 'DEG') {
+                expr = expr.replace(/sin\(/g, 'Math.sin(Math.PI/180*');
+                expr = expr.replace(/cos\(/g, 'Math.cos(Math.PI/180*');
+                expr = expr.replace(/tan\(/g, 'Math.tan(Math.PI/180*');
+                expr = expr.replace(/asin\(/g, '180/Math.PI*Math.asin(');
+                expr = expr.replace(/acos\(/g, '180/Math.PI*Math.acos(');
+                expr = expr.replace(/atan\(/g, '180/Math.PI*Math.atan(');
+            } else {
+                expr = expr.replace(/sin\(/g, 'Math.sin(');
+                expr = expr.replace(/cos\(/g, 'Math.cos(');
+                expr = expr.replace(/tan\(/g, 'Math.tan(');
+                expr = expr.replace(/asin\(/g, 'Math.asin(');
+                expr = expr.replace(/acos\(/g, 'Math.acos(');
+                expr = expr.replace(/atan\(/g, 'Math.atan(');
+            }
+
+            expr = expr.replace(/log\(/g, 'Math.log10(');
+            expr = expr.replace(/ln\(/g, 'Math.log(');
+            expr = expr.replace(/sqrt\(/g, 'Math.sqrt(');
+            
+            // Факториал: заменяем число! на factorial(число)
+            expr = expr.replace(/(\d+)!/g, 'factorial($1)');
+
+            // Безопасное вычисление
+            let result = new Function('factorial', 'return ' + expr)(factorial);
+            
+            // Округление для избежания ошибок плавающей запятой
+            if (typeof result === 'number') {
+                result = parseFloat(result.toFixed(10));
+            }
+            updateDisplay(String(result));
+        } catch (e) {
+            updateDisplay('Ошибка');
+        }
+    }
+
+    // Функции памяти
+    function memoryClear() { memory = 0; }
+    function memoryRecall() { append(String(memory)); }
+    function memoryAdd() {
+        calculate();
+        let val = parseFloat(display.value);
+        if (!isNaN(val)) memory += val;
+    }
+    function memorySub() {
+        calculate();
+        let val = parseFloat(display.value);
+        if (!isNaN(val)) memory -= val;
+    }
+
+    // Поддержка клавиатуры
+    document.addEventListener('keydown', (e) => {
+        const key = e.key;
+        if (/[0-9+\-*/().^]/.test(key)) append(key);
+        else if (key === 'Enter') calculate();
+        else if (key === 'Backspace') backspace();
+        else if (key === 'Escape') clearDisplay();
+    });
+</script>
+
+</body>
+</html>
